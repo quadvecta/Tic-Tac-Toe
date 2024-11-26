@@ -1,0 +1,159 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(120deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+    background-size: 300% 300%;
+    animation: gradientMove 10s ease infinite;
+  }
+  
+  @keyframes gradientMove {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .container {
+    margin: 50px auto;
+    width: 300px;
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+    justify-content: center;
+    margin: 20px auto;
+  }
+  
+  .cell {
+    background: rgba(255, 255, 255, 0.2); /* Glass-like */
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 15px; /* Smooth corners */
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    backdrop-filter: blur(8px); /* Glass effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), inset 0 -3px 5px rgba(255, 255, 255, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .cell:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2), inset 0 -3px 6px rgba(255, 255, 255, 0.5);
+  }
+  
+  .cell.taken {
+    pointer-events: none;
+  }
+  
+  .cell:active {
+    transform: scale(0.9); /* Bubble-like squish */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 -2px 4px rgba(255, 255, 255, 0.4);
+  }
+  
+  #status {
+    font-size: 1.2em;
+    color: #333;
+    margin: 10px 0;
+  }
+  
+  #resetButton {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #resetButton:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Winning Cells */
+.cell.winner {
+    animation: pulse 1s infinite;
+    background: rgba(255, 223, 186, 0.8);
+    box-shadow: 0 0 20px rgba(255, 223, 186, 0.8);
+    color: #ff6f61;
+  }
+  
+  /* Pulse Animation for Winning Cells */
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 20px rgba(255, 223, 186, 0.8);
+    }
+    50% {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 223, 186, 1);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 20px rgba(255, 223, 186, 0.8);
+    }
+  }
+  
+  /* Celebration Background Effect */
+  body.celebrate {
+    animation: confetti 2s ease-out;
+  }
+  
+  @keyframes confetti {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
+  }
+  
+  /* Status Text Styling */
+#status {
+  font-size: 1.5em;
+  color: #333;
+  margin: 20px 0;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Winning Text Animation */
+#status.winner {
+  color: #ff6f61;
+  animation: statusGlow 1.5s infinite alternate;
+  transform: scale(1.1); /* Slightly emphasize the text */
+}
+
+/* Turn Text Animation */
+#status.turn {
+  color: #6a9fb5;
+}
+
+/* Glowing Animation for Winning Text */
+@keyframes statusGlow {
+  0% {
+    text-shadow: 0 2px 4px rgba(255, 111, 97, 0.5), 0 0 10px rgba(255, 223, 186, 0.6);
+  }
+  100% {
+    text-shadow: 0 4px 6px rgba(255, 111, 97, 0.7), 0 0 15px rgba(255, 223, 186, 0.8);
+  }
+}
