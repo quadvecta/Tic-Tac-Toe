@@ -1,109 +1,200 @@
-
-const boardElement = document.getElementById("board");
-const statusElement = document.getElementById("status");
-const restartButton = document.getElementById("restart");
-const undoButton = document.getElementById("undo");
+const board = document.getElementById("board");
+const statusText = document.getElementById("status");
+const restartBtn = document.getElementById("restart");
+const undoBtn = document.getElementById("undo");
 const themeToggle = document.getElementById("theme-toggle");
+const modeSelect = document.getElementById("mode");
 
 const moveSound = document.getElementById("moveSound");
 const winSound = document.getElementById("winSound");
 const drawSound = document.getElementById("drawSound");
 
-let board = ["", "", "", "", "", "", "", "", ""];
-let currentPlayer = "X";
-let isGameActive = true;
-let history = [];
+let cells;
+let boardState;
+let currentPlayer;
+let gameActive;
+let moveHistory;
+let mode = "pvp";
 
-const winningConditions = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
-
-function handleResultValidation() {
-  let roundWon = false;
-  for (let i = 0; i < winningConditions.length; i++) {
-    const [a, b, c] = winningConditions[i];
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      roundWon = true;
-      document.querySelectorAll(".cell")[a].classList.add("win");
-      document.querySelectorAll(".cell")[b].classList.add("win");
-      document.querySelectorAll(".cell")[c].classList.add("win");
-      break;
-    }
-  }
-  if (roundWon) {
-    statusElement.textContent = `Player ${currentPlayer} wins!`;
-    isGameActive = false;
-    winSound.play();
-    return;
-  }
-
-  if (!board.includes("")) {
-    statusElement.textContent = "It's a draw!";
-    isGameActive = false;
-    drawSound.play();
-  }
-}
-
-function updateStatus() {
-  statusElement.textContent = `Player ${currentPlayer}'s turn`;
-}
-
-function handleCellClick(index) {
-  if (board[index] !== "" || !isGameActive) return;
-
-  board[index] = currentPlayer;
-  history.push(index);
+function initializeGame() {
+  board.innerHTML = "";
+  boardState = Array(9).fill("");
+  currentPlayer = "X";
+  gameActive = true;
+  moveHistory = [];
   renderBoard();
-  handleResultValidation();
-
-  if (isGameActive) {
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
-    updateStatus();
-  }
-
-  moveSound.play();
+  updateStatus();
 }
 
 function renderBoard() {
-  boardElement.innerHTML = "";
-  board.forEach((cell, index) => {
-    const cellElement = document.createElement("div");
-    cellElement.classList.add("cell");
-    cellElement.textContent = cell;
-    cellElement.addEventListener("click", () => handleCellClick(index));
-    boardElement.appendChild(cellElement);
+  board.innerHTML = "";
+  boardState.forEach((cell, index) => {
+    const cellDiv = document.createElement("div");
+    cellDiv.classList.add("cell");
+    cellDiv.dataset.index = index;
+    cellDiv.textContent = cell;
+    if (cell) cellDiv.classList.add(cell);
+    cellDiv.addEventListener("click", handleCellClick);
+    board.appendChild(cellDiv);
   });
+  cells = document.querySelectorAll(".cell");
 }
 
-restartButton.addEventListener("click", () => {
-  board = ["", "", "", "", "", "", "", "", ""];
-  currentPlayer = "X";
-  isGameActive = true;
-  history = [];
-  updateStatus();
-  renderBoard();
-});
+function handleCellClick(e) {
+  const index = e.target.dataset.index;
+  if (!gameActive || boardState[index] !== "") return;
 
-undoButton.addEventListener("click", () => {
-  if (history.length > 0 && isGameActive) {
-    const lastMove = history.pop();
-    board[lastMove] = "";
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
-    updateStatus();
-    renderBoard();
+  makeMove(index, currentPlayer);
+
+  if (mode === "ai" && gameActive && currentPlayer === "O") {
+    setTimeout(aiMove, 300);
   }
-});
+}
 
-themeToggle.addEventListener("click", () => {
+function makeMove(index, player) {
+  boardState[index] = player;
+  moveHistory.push(index);
+  moveSound.play();
+  renderBoard();
+  checkResult();
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  updateStatus();
+}
+
+function updateStatus() {
+  if (!gameActive) return;
+  statusText.textContent = `${currentPlayer}'s turn`;
+}
+
+function checkResult() {
+  const winPatterns = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  for (let pattern of winPatterns) {
+    const [a, b, c] = pattern;
+    if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+      highlightWin(pattern);
+      statusText.textContent = `${boardState[a]} wins!`;
+      winSound.play();
+      gameActive = false;
+      return;
+    }
+  }
+
+  if (!boardState.includes("")) {
+    statusText.textContent = "Draw!";
+    drawSound.play();
+    gameActive = false;
+  }
+}
+
+function highlightWin(pattern) {
+  pattern.forEach(i => cells[i].classList.add("win"));
+}
+
+function undoMove() {
+  if (!gameActive || moveHistory.length === 0) return;
+
+  const last = moveHistory.pop();
+  boardState[last] = "";
+
+  if (mode === "ai" && currentPlayer === "X" && moveHistory.length > 0) {
+    const aiLast = moveHistory.pop();
+    boardState[aiLast] = "";
+  }
+
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  renderBoard();
+  updateStatus();
+  gameActive = true;
+}
+
+function toggleTheme() {
   document.body.classList.toggle("dark");
+}
+
+function aiMove() {
+  let bestScore = -Infinity;
+  let move;
+
+  for (let i = 0; i < 9; i++) {
+    if (boardState[i] === "") {
+      boardState[i] = "O";
+      let score = minimax(boardState, 0, false);
+      boardState[i] = "";
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
+    }
+  }
+
+  if (move !== undefined) {
+    makeMove(move, "O");
+  }
+}
+
+function minimax(state, depth, isMaximizing) {
+  const winner = getWinner(state);
+  if (winner === "X") return -10 + depth;
+  if (winner === "O") return 10 - depth;
+  if (!state.includes("")) return 0;
+
+  if (isMaximizing) {
+    let best = -Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (state[i] === "") {
+        state[i] = "O";
+        let score = minimax(state, depth + 1, false);
+        state[i] = "";
+        best = Math.max(score, best);
+      }
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (state[i] === "") {
+        state[i] = "X";
+        let score = minimax(state, depth + 1, true);
+        state[i] = "";
+        best = Math.min(score, best);
+      }
+    }
+    return best;
+  }
+}
+
+function getWinner(state) {
+  const winPatterns = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6],
+  ];
+  for (let pattern of winPatterns) {
+    const [a, b, c] = pattern;
+    if (state[a] && state[a] === state[b] && state[a] === state[c]) {
+      return state[a];
+    }
+  }
+  return null;
+}
+
+// Event listeners
+restartBtn.addEventListener("click", initializeGame);
+undoBtn.addEventListener("click", undoMove);
+themeToggle.addEventListener("click", toggleTheme);
+modeSelect.addEventListener("change", (e) => {
+  mode = e.target.value;
+  initializeGame();
 });
 
-updateStatus();
-renderBoard();
+initializeGame();
