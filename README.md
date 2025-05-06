@@ -36,6 +36,6 @@
 
 ## 📸 Preview
 
-> ![image](https://github.com/user-attachments/assets/fdf12cac-b799-4817-b39c-13786ad6cef3)
+> ![image](https://github.com/user-attachments/assets/7f631ba0-ef8a-4be8-a8ae-3ade1d9dfe5b)
 
 ---
