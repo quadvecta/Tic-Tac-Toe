@@ -2,7 +2,7 @@
 # 🎮 Tic Tac Toe
 
 ## 🚀 Features
-
+- 🤖 [Added] AI Opponent
 - 🌓 Light/Dark Mode Toggle  
 - 🔁 Restart & Undo Moves  
 - 💡 Win Highlight & Animations  
