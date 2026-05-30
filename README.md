@@ -1,15 +1,15 @@
 
-# 🎮 Tic Tac Toe
+#  Tic Tac Toe
 
-## 🚀 Features
-- 🤖 [Added] AI Opponent
-- 🌓 Light/Dark Mode Toggle  
-- 🔁 Restart & Undo Moves  
-- 💡 Win Highlight & Animations  
-- 🎧 Sound Effects (Move, Win, Draw)  
-- 📱 Responsive Design for Mobile
+##  Features
+-  [Added] AI Opponent
+-  Light/Dark Mode Toggle  
+-  Restart & Undo Moves  
+-  Win Highlight & Animations  
+-  Sound Effects (Move, Win, Draw)  
+-  Responsive Design for Mobile
 
-## 🛠️ Setup
+##  Setup
 
 1. Clone the repo:
    ```bash
@@ -22,7 +22,7 @@
 
 3. Deploy and play!
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 ├── index.html
@@ -34,7 +34,7 @@
     └── draw.mp3
 ```
 
-## 📸 Preview
+##  Preview
 
 > ![image](https://github.com/user-attachments/assets/7f631ba0-ef8a-4be8-a8ae-3ade1d9dfe5b)
 
